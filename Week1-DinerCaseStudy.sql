@@ -64,3 +64,17 @@ WITH A AS
 )
 SELECT customer_id, product_name from A
 where A.rn=1
+
+--7. Which item was purchased just before the customer became a member?
+select A.customer_id, m.product_name
+from
+(
+  select
+  s.*, RANK() oVER (partition by s.customer_id order by s.order_date desc)
+  from dannys_diner.sales s
+  inner join dannys_diner.members mem
+  on s.customer_id = mem.customer_id and s.order_date<mem.join_date
+)A
+inner join
+dannys_diner.menu m
+on A.product_id=m.product_id and a.rank=1
